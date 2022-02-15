@@ -1,0 +1,15 @@
+
+
+.o_main {
+    min-height: 400px;
+}
+.o_main .o_header > div {
+    display: inline-block;
+    padding: 10px;
+}
+.o_main .o_header > div > a {
+    text-decoration: none;
+}
+footer {
+    bottom: 0px;
+}
