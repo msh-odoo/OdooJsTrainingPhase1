@@ -1,11 +1,13 @@
 function doRpc() {
+    let result;
     setTimeout(() => {
-        return {
+        result = {
             'name': 'Mohammed',
             'last_name': 'Shekha',
             'job': 'Odoo Developer'
         };
     }, 2000); // We assume server call takes 2 seconds to server the request
+    return result;
 }
 
 export function doRpcPromised(forceFail) {

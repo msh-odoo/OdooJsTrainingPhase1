@@ -2,6 +2,7 @@ import { simpleTimeout, simpleAsyncAwait } from "./async_await_simple.js";
 import { advancedAsyncAwait } from "./async_await_advance.js";
 import { simplePromise } from "./promise_simple.js";
 import { advancePromise } from "./promise_advance.js";
+import { MainComponent } from "./custom_event.js";
 
 export function showDetails(result) {
     const div = document.createElement('div');
@@ -27,6 +28,7 @@ function onClickSimpleTimeout(params) {
 }
 
 function onClickSimpleAsyncAwait(ev) {
+    // TODO: Show prevent default
     cleanDom();
     // Simple Async Await
     // TODO: Display return type of async function
@@ -60,11 +62,35 @@ async function onClickAdvancePromise(ev) {
     showDetails(datas[1]);
 }
 
-window.addEventListener('load', (event) => {
+function onClickCustomEvent(ev) {
+    cleanDom();
+    const mainComponent = new MainComponent();
+    mainComponent.start();
+    document.querySelector('.o_content').appendChild(mainComponent.el);
+}
+
+window.addEventListener('load', async (event) => {
+    // TODO: Show Event Propagation/Bubbling and how to stop it
     // TODO: Display event binding on single element and differentiate based on data attribute
     document.querySelector("#o_simple_timeout").addEventListener('click', onClickSimpleTimeout);
     document.querySelector("#o_simple_async_await").addEventListener('click', onClickSimpleAsyncAwait);
     document.querySelector("#o_advance_async_await").addEventListener('click', onClickAdvanceAsyncAwait);
     document.querySelector("#o_simple_promise").addEventListener('click', onClickSimplePromise);
     document.querySelector("#o_advance_promise").addEventListener('click', onClickAdvancePromise);
+    document.querySelector("#o_custom_event").addEventListener('click', onClickCustomEvent);
+
+    // const div = document.createElement('div');
+    // const button = document.createElement('button');
+    // button.textContent = "Click Me";
+    // button.setAttribute('class', 'click_me');
+    // div.appendChild(button);
+    // div.addEventListener("click", (ev) => {
+    //     debugger;
+    // });
+    // button.addEventListener('click', (ev) => {
+    //     ev.stopPropagation();
+    //     debugger;
+    // });
+    // document.querySelector(".o_content").appendChild(div);
+
 });
