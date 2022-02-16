@@ -4,7 +4,8 @@ export function simplePromise() {
             resolve({product: 'Desk', price: 2000, tax: '10'});
             // reject("Something went wrong!");
         }, 1000);
-    }).then(() => {
+    }).then((data) => {
         console.log("Inside simple promise resolve.");
+        return data;
     });
 }
