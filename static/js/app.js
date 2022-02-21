@@ -187,34 +187,159 @@ window.addEventListener('load', async (event) => {
     // res1 = myFunc();
     // console.log(res1);
 
-    class Observable {
-        constructor(state) {
-            this.state = state;
-            this.observers = [];
+    // Onserver
+    // class Observable {
+    //     constructor(state) {
+    //         this.state = state;
+    //         this.observers = [];
+    //     }
+    //     addObserver(observer) {
+    //         this.observers.push(observer);
+    //     }
+    //     notify() {
+    //         this.observers.forEach(observer => observer());
+    //     }
+    // }
+
+    // class ObserverClass {
+    //     constructor(state) {
+    //         this.observable = new Observable(state);
+    //         this.observable.addObserver(this.updateComponent);
+    //     }
+    //     updateState(state) {
+    //         this.observable.state = state;
+    //         this.observable.notify();
+    //     }
+    //     updateComponent() {
+    //         console.log("New :: ", observer.observable.state);
+    //     }
+    // }
+
+    // const observer = new ObserverClass({'hello': 'Hello World'});
+    // console.log("Old :: ", observer.observable.state);
+    // observer.updateState({'Hi': 'How are you?'});
+
+    function doRpc(url) {
+        return new Promise((resolve, reject) => {
+            // setTimeout(() => {
+            //     result = { aa: 'Hello', bb: 'Hi' };
+            //     reject("Something went wrong!");
+            // }, 500);
+            const xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("GET", url);
+            xmlhttp.send();
+            xmlhttp.addEventListener('load', () => {
+                const result = JSON.parse(xmlhttp.response);
+                resolve(result);
+            });
+            xmlhttp.addEventListener('error', () => {
+                reject("Something went wrong!");
+            });
+        });
+    }
+
+    // Async/Await
+    // async function abc() {
+    //     const result = await doRpc("https://reqres.in/api/users?page=2").catch((error) => {
+    //         console.log(error);
+    //     });
+    //     console.log(result);
+    // }
+
+    // Callback chain
+    // function abc() {
+    //     const result = doRpc("https://reqres.in/api/users?page=2").then((data) => {
+    //         console.log(data);
+    //     }, (error) => {
+    //         console.log(error);
+    //     });
+    // }
+
+    // abc();
+
+
+    class CoreComponent {
+        cssClass = '';
+        willStart() {
+            return Promise.resolve();
         }
-        addObserver(observer) {
-            this.observers.push(observer);
+        async start() {
+            await this.willStart();
+            this.render();
         }
-        notify() {
-            this.observers.forEach(observer => observer());
+        async render() {
+            const div = document.createElement('div');
+            div.setAttribute('class', this.cssClass);
+            this.el = div;
+            const childComps = this.constructor.childComponents;
+            if (childComps) {
+                for (const comp in childComps) {
+                    const compClass = childComps[comp];
+                    const compClassInst = new compClass();
+                    await compClassInst.start();
+                    this.el.appendChild(compClassInst.el);
+                }
+            }
         }
     }
 
-    class ObserverClass {
-        constructor(state) {
-            this.observable = new Observable(state);
-            this.observable.addObserver(this.updateComponent);
-        }
-        updateState(state) {
-            this.observable.state = state;
-            this.observable.notify();
-        }
-        updateComponent() {
-            console.log("New :: ", observer.observable.state);
+    class Character extends CoreComponent {
+        cssClass = 'o_character'
+        render() {
+            super.render();
+            const input = document.createElement('input');
+            input.setAttribute('type', 'text');
+            this.el.appendChild(input);
         }
     }
 
-    const observer = new ObserverClass({'hello': 'Hello World'});
-    console.log("Old :: ", observer.observable.state);
-    observer.updateState({'Hi': 'How are you?'});
+    class Float extends Character {
+        cssClass = 'o_float'
+    }
+
+    class Form extends CoreComponent {
+        cssClass = 'o_form'
+    }
+    Form.childComponents = { Character, Float };
+
+    class ProductList extends CoreComponent {
+        async willStart() {
+            this.data = await doRpc("https://reqres.in/api/users?page=2")
+        }
+        render() {
+            // super.render();
+            // const table = document.createElement('table');
+            // this.data.data.forEach((record) => {
+            //     const tr = document.createElement('tr');
+            //     for (const key in record) {
+            //         const td = document.createElement('td');
+            //         td.textContent = record[key];
+            //         tr.appendChild(td);
+            //     }
+            //     table.appendChild(tr);
+            // });
+            // this.el.appendChild(table);
+            this.el = qweb.render('ProductList', { records: this.data.data });
+            document.body.querySelector('.o_main').innerHTML = productList.el;
+        }
+    }
+
+    let xml = await fetch("/static/xml/app.xml");
+    const parsedXml = await xml.text();
+    const qweb = new QWeb2.Engine();
+    qweb.add_template(parsedXml);
+
+    window.qweb = qweb;
+
+    const productList = new ProductList();
+    await productList.start();
+    window.productList = productList;
+
+    // const form = new Form();
+    // form.start().then(() => {
+    //     document.body.querySelector('.o_main').appendChild(form.el);
+    // });
+
+
+
 });

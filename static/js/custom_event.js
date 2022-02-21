@@ -16,12 +16,12 @@ class BaseComponent {
 class Content extends BaseComponent {
     
     render() {
-        const div = document.createElement('div');
+        super.render();
+        this.el.setAttribute('class', 'o_content');
         const button = document.createElement('button');
         button.textContent = 'Click Me!';
         button.setAttribute('class', 'o_click_content_btn');
-        div.appendChild(button);
-        this.el = div;
+        this.el.appendChild(button);
     }
 
     bindEvents() {
@@ -36,6 +36,11 @@ class Content extends BaseComponent {
 }
 
 class Sidebar extends BaseComponent {
+    render() {
+        super.render();
+        this.el.setAttribute('class', 'o_sidebar');
+        this.el.textContent = "This is Sidebar";
+    }
     bindEvents() {
         document.addEventListener('add-item-to-sidebar', this.onAddItem.bind(this));
     }

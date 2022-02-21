@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="ProductList">
+        <div class="o_product_list">
+            <table>
+                <tr t-foreach="records" t-as="record">
+                    <td t-foreach="record" t-as="cell">
+                        <span t-esc="cell_value"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </t>
+</templates>
